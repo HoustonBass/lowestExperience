@@ -3,10 +3,10 @@ plugins {
 }
 
 repositories {
-	mavenLocal()
 	maven {
 		url = 'https://repo.runelite.net'
 	}
+	mavenLocal()
 	mavenCentral()
 }
 
