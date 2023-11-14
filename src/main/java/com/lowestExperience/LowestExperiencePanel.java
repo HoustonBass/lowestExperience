@@ -1,4 +1,4 @@
-package com.lowestLevel;
+package com.lowestExperience;
 
 import java.awt.*;
 import java.awt.event.ItemEvent;
@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
-import com.lowestLevel.LowestExperienceConfig.FilterOrder;
+import com.lowestExperience.LowestExperienceConfig.FilterOrder;
 
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Skill;

@@ -1,4 +1,4 @@
-package com.lowestLevel;
+package com.lowestExperience;
 
 import java.awt.image.BufferedImage;
 import java.util.EnumMap;
@@ -60,7 +60,7 @@ public class LowestExperiencePlugin extends Plugin
 		final BufferedImage icon = ImageUtil.loadImageResource(getClass(), "lowest_level_icon.png");
 
 		navButton = NavigationButton.builder()
-				.tooltip("Lowest Level")
+				.tooltip("Lowest Experience")
 				.icon(icon)
 				.panel(panel)
 				.priority(11)

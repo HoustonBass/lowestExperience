@@ -1,11 +1,11 @@
-package com.lowestLevel;
+package com.lowestExperience;
 
 import net.runelite.api.Skill;
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 
-@ConfigGroup("example")
+@ConfigGroup("LowestExperience")
 public interface LowestExperienceConfig extends Config
 {
 

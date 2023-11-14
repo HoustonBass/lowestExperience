@@ -1,4 +1,4 @@
-package com.lowestLevel;
+package com.lowestExperience;
 
 import java.awt.*;
 import java.text.NumberFormat;
@@ -6,6 +6,7 @@ import java.text.NumberFormat;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Skill;
 import net.runelite.client.ui.ColorScheme;
@@ -13,6 +14,7 @@ import net.runelite.client.ui.ColorScheme;
 @Slf4j
 public class SkillRow extends JPanel {
     private final Skill skill;
+    @Getter
     private int xpForSkill;
     private int xpDifference;
     private JLabel xpLabel;
@@ -94,10 +96,6 @@ public class SkillRow extends JPanel {
         xpDifferenceLabel.setText(formattedXpDifference());
     }
 
-    public int getXpForSkill() {
-        return xpForSkill;
-    }
-
     private String formattedXp(int xp) {
         return NumberFormat.getIntegerInstance().format(xp);
     }
@@ -112,7 +110,4 @@ public class SkillRow extends JPanel {
         repaint();
     }
 
-    public Skill getSkill() {
-        return skill;
-    }
 }
