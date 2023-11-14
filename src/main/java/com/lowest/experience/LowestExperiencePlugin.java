@@ -1,4 +1,4 @@
-package com.lowestExperience;
+package com.lowest.experience;
 
 import java.awt.image.BufferedImage;
 import java.util.EnumMap;
@@ -29,8 +29,7 @@ import net.runelite.client.util.ImageUtil;
 @PluginDescriptor(
 	name = "Lowest Experience",
 	description = "Easily see where you're slacking",
-	tags = {"panel"},
-	loadWhenOutdated = true
+	tags = {"panel"}
 )
 public class LowestExperiencePlugin extends Plugin
 {
@@ -113,11 +112,7 @@ public class LowestExperiencePlugin extends Plugin
 	}
 
 	private void rebuildList() {
-		List<Map.Entry<Skill, Integer>> skillOrder = currentXpMap.entrySet().stream()
-				.sorted(Map.Entry.comparingByValue(Integer::compare))
-				.collect(Collectors.toList());
-
-		panel.updateSkillXp(skillOrder);
+		panel.setCurrentXpMap(currentXpMap);
 	}
 
 	@Override

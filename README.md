@@ -11,3 +11,5 @@ This can help you prioritized how to spend afk time, so your tears don't acciden
 
 There is also a filtering feature so you can target which skill you want to see in relation to the others.
 This helped me when I wanted to keep my defense and attack xp the same
+
+<img src="how-to.png" width="400px"/>

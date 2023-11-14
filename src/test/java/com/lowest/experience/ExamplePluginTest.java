@@ -1,4 +1,4 @@
-package com.lowestExperience;
+package com.lowest.experience;
 
 import net.runelite.client.RuneLite;
 import net.runelite.client.externalplugins.ExternalPluginManager;

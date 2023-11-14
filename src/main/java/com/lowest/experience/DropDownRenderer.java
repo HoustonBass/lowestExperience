@@ -1,4 +1,4 @@
-package com.lowestExperience;
+package com.lowest.experience;
 
 import java.awt.*;
 

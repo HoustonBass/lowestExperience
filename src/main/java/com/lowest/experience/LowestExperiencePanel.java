@@ -1,8 +1,9 @@
-package com.lowestExperience;
+package com.lowest.experience;
 
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.List;
@@ -11,8 +12,6 @@ import java.util.stream.Collectors;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-
-import com.lowestExperience.LowestExperienceConfig.FilterOrder;
 
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Skill;
@@ -24,17 +23,43 @@ public class LowestExperiencePanel extends PluginPanel {
 
     private final LowestExperienceConfig config;
     private Skill selectedSkill;
-    private final JComboBox<Enum<FilterOrder>> skillDropdown;
+    private final JComboBox<Skill[]> skillDropdown;
     private final int DROPDOWN_HEIGHT = 20;
     private final JPanel listContainer = new JPanel();
     private List<SkillRow> rows = new ArrayList<>();
     private final Map<Skill, SkillRow> rowMap = new EnumMap<>(Skill.class);
+    private EnumMap<Skill, Integer> xpMap;
 
+    private static final Skill[] LOWEST_ORDER = new Skill[]{
+            Skill.RUNECRAFT,
+            Skill.AGILITY,
+            Skill.SMITHING,
+            Skill.CONSTRUCTION,
+            Skill.MINING,
+            Skill.HERBLORE,
+            Skill.HUNTER,
+            Skill.CRAFTING,
+            Skill.FARMING,
+            Skill.SLAYER,
+            Skill.PRAYER,
+            Skill.FISHING,
+            Skill.THIEVING,
+            Skill.WOODCUTTING,
+            Skill.FIREMAKING,
+            Skill.FLETCHING,
+            Skill.MAGIC,
+            Skill.DEFENCE,
+            Skill.ATTACK,
+            Skill.COOKING,
+            Skill.RANGED,
+            Skill.HITPOINTS,
+            Skill.STRENGTH
+    };
 
     public LowestExperiencePanel(LowestExperienceConfig config) {
         this.config = config;
-        selectedSkill = config.defaultSkill().getSkill();
-        skillDropdown = makeNewDropdown(FilterOrder.values());
+        selectedSkill = config.defaultSkill();
+        skillDropdown = makeNewDropdown();
 
         getParent().setLayout(new BorderLayout());
         getParent().add(this, BorderLayout.CENTER);
@@ -47,42 +72,38 @@ public class LowestExperiencePanel extends PluginPanel {
         add(skillOrderContainer(), BorderLayout.CENTER);
 
         selectSkill(selectedSkill);
-
     }
 
     private JPanel skillOrderContainer() {
         listContainer.setLayout(new GridLayout(0, 1));
         listContainer.setBackground(ColorScheme.LIGHT_GRAY_COLOR.darker());
-        for(Skill skill : Skill.values()) {
-            if(Skill.OVERALL.equals(skill)) {
-                continue;
-            }
-            SkillRow row = new SkillRow(skill, 0, config.displayCurrentXp(), config.displayXpDifference());
-            rows.add(row);
-            rowMap.put(skill, row);
-        }
-        for(SkillRow row : rows) {
-            listContainer.add(row);
-        }
+        Arrays.stream(Skill.values())
+                .forEach(skill -> {
+                    SkillRow row = new SkillRow(skill, 0, config.displayCurrentXp(), config.displayXpDifference());
+                    rows.add(row);
+                    rowMap.put(skill, row);
+                    listContainer.add(row);
+        });
         return listContainer;
     }
 
-    public void updateSkillXp(List<Map.Entry<Skill, Integer>> skillOrder) {
-        for(Map.Entry<Skill, Integer> entry : skillOrder) {
-            rowMap.get(entry.getKey()).setXpForSkill(entry.getValue());
-        }
+    public void updateSkillXp() {
+        xpMap.forEach((key, value) -> {
+            if(rowMap.containsKey(key)) {
+                rowMap.get(key).setXpForSkill(value);
+            }
+        });
         listContainer.removeAll();
         rows = rows.stream()
                 .sorted(Comparator.comparing(SkillRow::getXpForSkill, Integer::compare))
                 .collect(Collectors.toList());
-        SkillRow lowestSkill = rows.get(0);
-        for(SkillRow row : rows) {
-            if(lowestSkill.equals(row)) {
-                continue;
-            }
+        Integer currentXp = xpMap.get(selectedSkill);
+        rows.forEach(row -> {
+            row.computeDifference(currentXp);
             listContainer.add(row);
-            row.computeDifference(lowestSkill.getXpForSkill());
-        }
+        });
+        listContainer.revalidate();
+        listContainer.repaint();
     }
 
     private JPanel levelSelectContainer() {
@@ -91,18 +112,18 @@ public class LowestExperiencePanel extends PluginPanel {
 
         levelsContainer.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-        JPanel filtersPanel = makeDropdownPanel(skillDropdown, "Skill");
+        JPanel filtersPanel = makeDropdownPanel(skillDropdown);
         filtersPanel.setPreferredSize(new Dimension(PANEL_WIDTH, DROPDOWN_HEIGHT));
 
         levelsContainer.add(filtersPanel, BorderLayout.NORTH);
         return levelsContainer;
     }
 
-    private JComboBox<Enum<FilterOrder>> makeNewDropdown(Enum<FilterOrder>[] values) {
-        JComboBox<Enum<FilterOrder>> dropdown = new JComboBox<>(values);
+    private JComboBox<Skill[]> makeNewDropdown() {
+        JComboBox<Skill[]> dropdown = new JComboBox(LOWEST_ORDER);
         dropdown.setFocusable(false);
-        for(int i=0; i < values.length; i++) {
-            if(((FilterOrder) values[i]).getSkill().equals(selectedSkill)) {
+        for(int i=0; i < LOWEST_ORDER.length; i++) {
+            if((LOWEST_ORDER[i]).equals(selectedSkill)) {
                 dropdown.setSelectedIndex(i);
                 break;
             }
@@ -113,10 +134,11 @@ public class LowestExperiencePanel extends PluginPanel {
         {
             if (e.getStateChange() == ItemEvent.SELECTED)
             {
-                FilterOrder skill = (FilterOrder) e.getItem();
+                Skill skill = (Skill) e.getItem();
                 unselectSkill(selectedSkill);
-                selectedSkill = skill.getSkill();
+                selectedSkill = skill;
                 selectSkill(selectedSkill);
+                updateSkillXp();
             }
         });
 
@@ -131,8 +153,8 @@ public class LowestExperiencePanel extends PluginPanel {
         rowMap.get(skill).select();
     }
 
-    private JPanel makeDropdownPanel(JComboBox dropdown, String name) {
-        JLabel filterName = new JLabel(name);
+    private JPanel makeDropdownPanel(JComboBox<Skill[]> dropdown) {
+        JLabel filterName = new JLabel("Skills");
         filterName.setForeground(Color.WHITE);
 
         JPanel filtersPanel = new JPanel();
@@ -142,5 +164,10 @@ public class LowestExperiencePanel extends PluginPanel {
         filtersPanel.add(dropdown, BorderLayout.EAST);
 
         return filtersPanel;
+    }
+
+    public void setCurrentXpMap(Map<Skill, Integer> currentXpMap) {
+        xpMap = (EnumMap<Skill, Integer>) currentXpMap;
+        updateSkillXp();
     }
 }

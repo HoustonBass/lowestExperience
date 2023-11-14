@@ -1,4 +1,4 @@
-package com.lowestExperience;
+package com.lowest.experience;
 
 import net.runelite.api.Skill;
 import net.runelite.client.config.Config;
@@ -15,9 +15,9 @@ public interface LowestExperienceConfig extends Config
 			description = "default target skill to be the lowest",
 			position = 1
 	)
-	default FilterOrder defaultSkill()
+	default Skill defaultSkill()
 	{
-		return FilterOrder.RUNECRAFT;
+		return Skill.RUNECRAFT;
 	}
 
 	@ConfigItem(
@@ -43,21 +43,4 @@ public interface LowestExperienceConfig extends Config
 	}
 
 
-
-
-	enum FilterOrder {
-		RUNECRAFT(Skill.RUNECRAFT),
-		AGILITY(Skill.AGILITY),
-		HUNTER(Skill.HUNTER),
-		;
-
-		private final Skill skill;
-		FilterOrder(Skill skill) {
-			this.skill = skill;
-		}
-
-		public Skill getSkill() {
-			return skill;
-		}
-	}
 }
